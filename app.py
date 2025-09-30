@@ -61,6 +61,7 @@ class AddForm(tk.Frame):
             x = float(input)
             return True
         except ValueError:
+            self.bell()
             return False
 
     def form_submit(self):
@@ -79,9 +80,11 @@ class AddForm(tk.Frame):
             else:
                 flag = False
                 self.l_choose['style'] = "ErrLbl.TLabel"
+                self.bell()
         except ValueError:
             flag = False
             self.l_amount['style'] = "ErrLbl.TLabel"
+            self.bell()
 
         if flag:
             insert_payment = (amount, payment_date, expense_id)
