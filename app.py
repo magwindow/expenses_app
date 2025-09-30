@@ -1,6 +1,7 @@
 import expenses_helper as eh
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox as mbox
 
 from tkcalendar import DateEntry
 
@@ -19,6 +20,7 @@ class App(tk.Tk):
 
         self.put_frames()
         self.put_menu()
+        self.popup = Popup(self)
 
     def put_menu(self):
         self.config(menu=MainMenu(self))
@@ -35,13 +37,26 @@ class App(tk.Tk):
         self.put_frames()
         self.put_menu()
 
-    def quit(self):
-        self.destroy()
-
     def switch_lang(self, language):
         self.lang = language
         self.schema = eh.get_lang_schema(language)
         self.refresh()
+
+
+class Popup:
+    def __init__(self, master):
+        self.master = master
+
+    def show(self, window_type):
+        getattr(self, window_type)()
+
+    def quit(self):
+        answer = mbox.askquestion("Quit", "Are you sure?")
+        if answer == "yes":
+            self.master.destroy()
+
+    def faq(self):
+        mbox.showinfo("FAQ", "This functionality not ready yet")
 
 
 class MainMenu(tk.Menu):
@@ -54,7 +69,7 @@ class MainMenu(tk.Menu):
 
         file_menu.add_command(label="Refresh", command=mainwindow.refresh)
         file_menu.add_separator()
-        file_menu.add_command(label="Quit", command=mainwindow.quit)
+        file_menu.add_command(label="Quit", command=lambda: mainwindow.popup.show("quit"))
 
         lang_menu = tk.Menu(options_menu)
         self.s_var = tk.StringVar()
@@ -69,7 +84,7 @@ class MainMenu(tk.Menu):
         options_menu.add_command(label="Switch theme")
         help_menu.add_command(label="About Us")
         help_menu.add_separator()
-        help_menu.add_command(label="FAQ")
+        help_menu.add_command(label="FAQ", command=lambda: mainwindow.popup.show("faq"))
 
         self.add_cascade(label="File", menu=file_menu)
         self.add_cascade(label="Options", menu=options_menu)
