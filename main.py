@@ -1,18 +1,42 @@
 import tkinter as tk
+import sqlite3
+
+
+def get_statistic_data():
+    all_data = []
+    with sqlite3.connect("database.db") as db:
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        query = """SELECT * FROM payments JOIN expenses ON expenses.id = payments.expense_id"""
+        cursor.execute(query)
+        all_data = cursor
+    return all_data
+
+
+def get_most_common_item():
+    data = get_statistic_data()
+    quantity = {}
+    for payments in data:
+        if payments['expense_id'] in quantity:
+            quantity[payments['expense_id']]['qty'] += 1
+        else:
+            quantity[payments['expense_id']] = {'qty': 1, 'name': payments['name']}
+    return max(quantity.values(), key=lambda x: x['qty'])['name']
+
 
 window = tk.Tk()
-window.title('My App')
+window.title("My App")
 
-frame_add_form = tk.Frame(window, bg='green')
-frame_statistic = tk.Frame(window, bg='yellow')
-frame_list = tk.Frame(window, bg='blue')
+frame_add_form = tk.Frame(window, bg="green")
+frame_statistic = tk.Frame(window, bg="yellow")
+frame_list = tk.Frame(window, bg="blue")
 
 frame_add_form.grid(row=0, column=0, sticky="ns")
 frame_statistic.grid(row=0, column=1)
 frame_list.grid(row=1, column=0, columnspan=2, sticky="we")
 
 l_most_commot_text = tk.Label(frame_statistic, text="The most common item")
-l_most_commot_value = tk.Label(frame_statistic, text="Food", font="Helvetica 14 bold")
+l_most_commot_value = tk.Label(frame_statistic, text=get_most_common_item(), font="Helvetica 14 bold")
 l_exp_item_text = tk.Label(frame_statistic, text="The most expensive item")
 l_exp_item_value = tk.Label(frame_statistic, text="Gift", font="Helvetica 14 bold")
 l_exp_day_text = tk.Label(frame_statistic, text="The most expensive day")
