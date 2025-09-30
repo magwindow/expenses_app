@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 
 def get_statistic_data():
@@ -21,3 +22,42 @@ def get_most_common_item():
         else:
             quantity[payments['expense_id']] = {'qty': 1, 'name': payments['name']}
     return max(quantity.values(), key=lambda x: x['qty'])['name']
+
+
+def get_most_exp_item():
+    data = get_statistic_data()
+    return max(list(data), key=lambda x: x['amount'])['name']
+
+
+def get_timestamp(y, m, d):
+    return int(datetime.datetime.timestamp(datetime.datetime(y, m, d)))
+
+
+def get_date(tmstmp):
+    return datetime.datetime.fromtimestamp(tmstmp).date()
+
+
+def get_most_exp_day():
+    data = get_statistic_data()
+    weekdays = ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
+    days = {}
+    for payment in data:
+        if get_date(payment['payment_date']).weekday() in days:
+            days[get_date(payment['payment_date']).weekday()] += payment['amount']
+        else:
+            days[get_date(payment['payment_date']).weekday()] = payment['amount']
+    return weekdays[max(days, key=days.get)]
+
+
+def get_most_exp_month():
+    data = get_statistic_data()
+    month_list = ("0", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                  "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь")
+    days = {}
+    for payment in data:
+        if get_date(payment['payment_date']).month in days:
+            days[get_date(payment['payment_date']).month] += payment['amount']
+        else:
+            days[get_date(payment['payment_date']).month] = payment['amount']
+    print(days)
+    return month_list[max(days, key=days.get)]
