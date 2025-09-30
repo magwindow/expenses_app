@@ -85,3 +85,14 @@ def get_all_expenses_items():
     all_data['accordance'] = {result[k]: k for k in result}
     all_data['names'] = [v for v in result.values()]
     return all_data
+
+
+def insert_payments(insert_payment):
+    success = False
+    with sqlite3.connect("database.db") as db:
+        cursor = db.cursor()
+        query = """INSERT INTO payments(amount, payment_date, expense_id) VALUES (?,?,?);"""
+        cursor.execute(query, insert_payment)
+        db.commit()
+        success = True
+    return success
