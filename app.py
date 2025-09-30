@@ -9,6 +9,8 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("My App")
+        self.lang = "en"
+        self.schema = eh.get_lang_schema(self.lang)
         self.style = ttk.Style()
         self.style.configure("ErrLbl.TLabel", foreground="red", padding=(10, 10, 60, 10))
         self.style.configure("SmplLbl.TLabel", padding=(10, 10, 60, 10))
@@ -36,15 +38,15 @@ class AddForm(tk.Frame):
         self.put_widgets()
 
     def put_widgets(self):
-        self.l_choose = ttk.Label(self, text="Choose an expense item", style="SmplLbl.TLabel")
+        self.l_choose = ttk.Label(self, text=self.master.schema['l_choose'], style="SmplLbl.TLabel")
         self.f_choose = ttk.Combobox(self, values=self.items['names'])
-        self.l_amount = ttk.Label(self, text="Enter amount")
+        self.l_amount = ttk.Label(self, text=self.master.schema['l_amount'])
         self.f_amount = ttk.Entry(self, justify=tk.RIGHT, validate="key",
                                   validatecommand=(self.register(self.validate_amount), '%P'))
-        self.l_date = ttk.Label(self, text="Enter date")
+        self.l_date = ttk.Label(self, text=self.master.schema['l_date'])
         self.f_date = DateEntry(self, foreground="black", normalforeground="black",
                                 selectforeground="white", background="white", date_pattern="dd-mm-YYYY")
-        self.btn_submit = ttk.Button(self, text="Submit", command=self.form_submit)
+        self.btn_submit = ttk.Button(self, text=self.master.schema['btn_submit'], command=self.form_submit)
 
         self.l_choose.grid(row=0, column=0, sticky="w", padx=10)
         self.f_choose.grid(row=0, column=1, sticky="e", padx=10)
@@ -99,17 +101,17 @@ class StatFrame(tk.Frame):
         self.put_widgets()
 
     def put_widgets(self):
-        l_most_commot_text = ttk.Label(self, text="The most common item")
-        l_most_commot_value = ttk.Label(self, text=eh.get_most_common_item(), style="BldLbl.TLabel")
-        l_exp_item_text = ttk.Label(self, text="The most expensive item")
+        l_most_common_text = ttk.Label(self, text=self.master.schema['l_most_common'])
+        l_most_common_value = ttk.Label(self, text=eh.get_most_common_item(), style="BldLbl.TLabel")
+        l_exp_item_text = ttk.Label(self, text=self.master.schema['l_exp_item'])
         l_exp_item_value = ttk.Label(self, text=eh.get_most_exp_item(), style="BldLbl.TLabel")
-        l_exp_day_text = ttk.Label(self, text="The most expensive day")
-        l_exp_day_value = ttk.Label(self, text=eh.get_most_exp_day(), style="BldLbl.TLabel")
-        l_exp_month_text = ttk.Label(self, text="The most expensive month")
-        l_exp_month_value = ttk.Label(self, text=eh.get_most_exp_month(), style="BldLbl.TLabel")
+        l_exp_day_text = ttk.Label(self, text=self.master.schema['l_exp_day'])
+        l_exp_day_value = ttk.Label(self, text=eh.get_most_exp_day(self.master.lang), style="BldLbl.TLabel")
+        l_exp_month_text = ttk.Label(self, text=self.master.schema['l_exp_month'])
+        l_exp_month_value = ttk.Label(self, text=eh.get_most_exp_month(self.master.lang), style="BldLbl.TLabel")
 
-        l_most_commot_text.grid(row="0", column="0", sticky="w")
-        l_most_commot_value.grid(row="0", column="1", sticky="e")
+        l_most_common_text.grid(row="0", column="0", sticky="w")
+        l_most_common_value.grid(row="0", column="1", sticky="e")
         l_exp_item_text.grid(row="1", column="0", sticky="w")
         l_exp_item_value.grid(row="1", column="1", sticky="e")
         l_exp_day_text.grid(row="2", column="0", sticky="w")
@@ -126,7 +128,13 @@ class TableFrame(tk.Frame):
 
     def put_widgets(self):
         table = ttk.Treeview(self, show="headings")
-        heads = ("id", "name", "amount", "date")
+        l = self.master.schema
+        heads = [
+            l['l_head_id'],
+            l['l_head_name'],
+            l['l_head_amount'],
+            l['l_head_date']
+        ]
         table['columns'] = heads
 
         for header in heads:

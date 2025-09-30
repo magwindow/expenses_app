@@ -42,29 +42,36 @@ def get_date(tmstmp):
     return datetime.datetime.fromtimestamp(tmstmp).date()
 
 
-def get_most_exp_day():
+def get_most_exp_day(lang):
     data = get_statistic_data()
-    weekdays = ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
+    weekdays = {
+        "ru": ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"),
+        "en": ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    }
     days = {}
     for payment in data:
         if get_date(payment['payment_date']).weekday() in days:
             days[get_date(payment['payment_date']).weekday()] += payment['amount']
         else:
             days[get_date(payment['payment_date']).weekday()] = payment['amount']
-    return weekdays[max(days, key=days.get)]
+    return weekdays[lang][max(days, key=days.get)]
 
 
-def get_most_exp_month():
+def get_most_exp_month(lang):
     data = get_statistic_data()
-    month_list = ("0", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-                  "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь")
+    month_list = {
+        "ru": ("0", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+               "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"),
+        "en": ("0", "January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December")
+    }
     days = {}
     for payment in data:
         if get_date(payment['payment_date']).month in days:
             days[get_date(payment['payment_date']).month] += payment['amount']
         else:
             days[get_date(payment['payment_date']).month] = payment['amount']
-    return month_list[max(days, key=days.get)]
+    return month_list[lang][max(days, key=days.get)]
 
 
 def get_table_data():
@@ -96,3 +103,14 @@ def insert_payments(insert_payment):
         db.commit()
         success = True
     return success
+
+
+def get_lang_schema(lang):
+    result = {}
+    with sqlite3.connect("database.db") as db:
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        query = """SELECT ls_name, ls_{} FROM lang_schema""".format(lang)
+        cursor.execute(query)
+        result = dict(cursor)
+    return result
