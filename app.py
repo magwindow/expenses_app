@@ -10,6 +10,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("My App")
         self.style = ttk.Style()
+        self.style.configure("ErrLbl.TLabel", foreground="red", padding=(10, 10, 60, 10))
         self.style.configure("SmplLbl.TLabel", padding=(10, 10, 60, 10))
         self.style.configure("BldLbl.TLabel", font=("Helvetica", 14, "bold"), padding=(0, 10, 0, 10))
         self['background'] = "#EBEBEB"
@@ -70,13 +71,17 @@ class AddForm(tk.Frame):
         try:
             expense_id = self.items['accordance'][self.f_choose.get()]
             amount = float(self.f_amount.get())
+            self.l_choose['style'] = "SmpLbl.TLabel"
+            self.l_amount['style'] = "SmpLbl.TLabel"
         except KeyError:
             if self.f_choose.get() != "":
                 pass
             else:
                 flag = False
+                self.l_choose['style'] = "ErrLbl.TLabel"
         except ValueError:
             flag = False
+            self.l_amount['style'] = "ErrLbl.TLabel"
 
         if flag:
             insert_payment = (amount, payment_date, expense_id)
