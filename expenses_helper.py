@@ -61,3 +61,9 @@ def get_most_exp_month():
             days[get_date(payment['payment_date']).month] = payment['amount']
     print(days)
     return month_list[max(days, key=days.get)]
+
+
+def get_table_data():
+    data = get_statistic_data()
+    return [(i['id'], i['name'], i['amount'], '{:%d-%m-%Y}'.format(
+        get_date(i['payment_date']))) for i in data]

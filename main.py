@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import ttk
+
 import expenses_helper as eh
 
 window = tk.Tk()
@@ -31,8 +33,23 @@ l_exp_month_text.grid(row="3", column="0", sticky="w", padx=10, pady=10)
 l_exp_month_value.grid(row="3", column="1", sticky="e", padx=10, pady=10)
 
 l_temp_frame_add_form = tk.Label(frame_add_form, text="frame_add_form")
-l_temp_frame_list = tk.Label(frame_list, text="frame_list")
 l_temp_frame_add_form.pack(expand=True, padx=20, pady=20)
-l_temp_frame_list.pack(expand=True, padx=20, pady=20)
+
+heads = ("id", "name", "amount", "date")
+table = ttk.Treeview(frame_list, show="headings")
+table['columns'] = heads
+
+for header in heads:
+    table.heading(header, text=header, anchor="center")
+    table.column(header, anchor="center")
+
+for row in eh.get_table_data():
+    table.insert('', tk.END, values=row)
+
+scroll_pane = ttk.Scrollbar(frame_list, command=table.yview)
+table.configure(yscrollcommand=scroll_pane.set)
+scroll_pane.pack(side=tk.RIGHT, fill=tk.Y)
+table.pack(expand=tk.YES, fill=tk.BOTH)
+
 
 window.mainloop()
