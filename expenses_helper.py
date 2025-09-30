@@ -33,6 +33,11 @@ def get_timestamp(y, m, d):
     return int(datetime.datetime.timestamp(datetime.datetime(y, m, d)))
 
 
+def get_timestamp_from_string(s):
+    t = s.split('-')
+    return get_timestamp(int(t[2]), int(t[1]), int(t[0]))
+
+
 def get_date(tmstmp):
     return datetime.datetime.fromtimestamp(tmstmp).date()
 
@@ -59,7 +64,6 @@ def get_most_exp_month():
             days[get_date(payment['payment_date']).month] += payment['amount']
         else:
             days[get_date(payment['payment_date']).month] = payment['amount']
-    print(days)
     return month_list[max(days, key=days.get)]
 
 
@@ -67,3 +71,17 @@ def get_table_data():
     data = get_statistic_data()
     return [(i['id'], i['name'], i['amount'], '{:%d-%m-%Y}'.format(
         get_date(i['payment_date']))) for i in data]
+
+
+def get_all_expenses_items():
+    all_data = {'accordance': {}, 'names': []}
+    result = {}
+    with sqlite3.connect("database.db") as db:
+        db.row_factory = sqlite3.Row
+        cursor = db.cursor()
+        query = """SELECT id, name FROM expenses"""
+        cursor.execute(query)
+        result = dict(cursor)
+    all_data['accordance'] = {result[k]: k for k in result}
+    all_data['names'] = [v for v in result.values()]
+    return all_data
